@@ -15,7 +15,7 @@ public interface IInteractible
 
 public class InteractibleGameObject : MonoBehaviour, IInteractible
 {
-    public static event EventHandler<OnClickEventArgs> RaiseOnClick;
+    public event EventHandler<OnClickEventArgs> RaiseOnClick;
 
     public void OnClick()
     {

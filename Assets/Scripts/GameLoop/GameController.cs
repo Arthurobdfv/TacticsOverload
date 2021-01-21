@@ -24,7 +24,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        m_uiManager = FindObjectOfType<UIManager>() ?? throw new MissingComponentOnStartException(nameof(m_uiManager));
+        m_uiManager = Injector.GetInstance<UIManager>() ?? throw new MissingComponentOnStartException(nameof(m_uiManager));
         m_mapGeneration = FindObjectOfType<MapGeneration>() ?? throw new MissingComponentOnStartException(nameof(m_mapGeneration));
         m_allPlayers.ForEach(p =>
         {
@@ -81,5 +81,10 @@ public class GameController : MonoBehaviour
         if (ActivePlayer.Units.Contains(sender)) {
             m_uiManager.ShowCommandPanel(sender as Unit, ActivePlayer.m_actions);
         } else m_uiManager.ShowInfoPanel(sender as Unit);
+    }
+
+    private void Awake()
+    {
+        Injector.RegisterContainer<GameController>(this);
     }
 }

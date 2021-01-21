@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Unit
 {
 
     public string Name => m_name;
@@ -48,9 +48,16 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        Stats = new CharacterStats()
+        {
+            Move = 2,
+            MaxHealth = 10,
+            Attack = 3
+        };
+
         var x = gameObject.GetComponent<Unit>();
         Units.Add(x);
-        m_actions.Add(new MoveAction());
+        m_actions.Add(new MoveAction(this));
         m_actions.Add(new AttackAction());
     }
 

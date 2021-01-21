@@ -23,10 +23,10 @@ public class UIManager : MonoBehaviour
 
     public GameObject CurrentPanel
     {
-        get => m_currentPanel; 
+        get => m_currentPanel;
         set
         {
-            if(m_currentPanel != null)
+            if (m_currentPanel != null)
             {
                 DestroyPanel();
             }
@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour
         get => m_currentPopup;
         set
         {
-            if(m_currentPopup != null)
+            if (m_currentPopup != null)
             {
                 DestroyPopup();
             }
@@ -54,8 +54,9 @@ public class UIManager : MonoBehaviour
         foreach (var ac in actions)
         {
             var btnGo = Instantiate(m_actionButtonPrefab, CurrentPanel.transform);
-            var btnComp = btnGo.GetComponent<Button>();
-            btnComp.onClick.AddListener(delegate { ac.Action(unit.Stats); });
+            var btnComp = btnGo.GetComponent<ButtonScript>();
+            btnComp.Label = ac.ActionName;
+            btnComp.Action = delegate { ac.Action(unit.Stats); };
         }
     }
 
@@ -64,12 +65,20 @@ public class UIManager : MonoBehaviour
         CurrentPanel = Instantiate(m_commandPanel, transform);
         var btnGo = Instantiate(m_actionButtonPrefab, CurrentPanel.transform);
         var btnComp = btnGo.GetComponent<Button>();
-        btnComp.onClick.AddListener(delegate { ShowPopup(unit.ToString()); });
+        btnComp.onClick.AddListener(delegate { ShowPopup(WindowType.Popup, unit.ToString()); });
     }
 
-    public void ShowPopup(string Content)
+    public void ShowPopup(WindowType type, string Content, Action onConfirm = null, Action onCancel = null)
     {
-        StartCoroutine(Popup(Content,DestroyPopup));
+        switch (type)
+        {
+            case WindowType.Popup:
+                StartCoroutine(Popup(Content, DestroyPopup));
+                break;
+            case WindowType.YesNoPopup:
+                StartCoroutine(Popup(Content, DestroyPopup, onConfirm, onCancel));
+                break;
+        }
     }
 
     IEnumerator Popup(string content, Action callback)
@@ -88,6 +97,23 @@ public class UIManager : MonoBehaviour
         callback();
     }
 
+    IEnumerator Popup(string content, Action callback, Action onConfirm, Action onCancel)
+    {
+        CurrentPopup = Instantiate(m_popupWindow, transform);
+        var textLabel = Instantiate(m_textField, CurrentPopup.transform).GetComponent<TMP_Text>();
+        textLabel.text = content;
+        while (true)
+        {
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                onCancel?.Invoke();
+                break;
+            }
+            yield return null;
+        }
+        callback?.Invoke();
+    }
+
 
     private void DestroyPanel()
     {
@@ -100,4 +126,10 @@ public class UIManager : MonoBehaviour
         Destroy(m_currentPopup);
         m_currentPopup = null;
     }
+
+    private void Awake()
+    {
+        Injector.RegisterContainer<UIManager>(this);
+    }
 }
+

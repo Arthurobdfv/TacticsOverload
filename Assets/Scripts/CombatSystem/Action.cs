@@ -11,9 +11,16 @@ public enum ActionType
 
 public interface IAction
 {
+    Unit Entity { get; }
     ActionType ActionType { get; }
 
+    string ActionName { get; }
+
     void Action(CharacterStats stats, Action ActionCallback = null);
+
+    void ShowActionUI();
+
+    void ShowConfirmation(Action onConfirm, Action onCancel);
 }
 
 public class CharacterStats {
