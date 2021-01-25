@@ -4,27 +4,26 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class MoveAction : IAction
+public class MoveAction : BaseAction
 {
     private readonly IMapGenerator _mapGen;
 
-    public ActionType ActionType { get => ActionType.Move; }
+    private Action callback;
 
-    public string ActionName => "Move";
-
-    public Unit Entity { get; set; }
-
-    public MoveAction(Unit entity)
+    public MoveAction(Unit entity, Action<object, EventArgs> onComplete) : base(entity, ActionType.Move, "Move", onComplete)
     {
         _mapGen = Injector.GetInstance<IMapGenerator>() ?? throw new ArgumentNullException(nameof(_mapGen));
         Entity = entity;
+        ActionCompleted += onComplete.Invoke;
     }
 
     private List<MapTerrain> subscriptions;
 
     private ActionType m_actionType;
-    public void Action(CharacterStats charStats, Action ActionCallback = null)
+
+    public override void Action(CharacterStats charStats, Action ActionCallback = null)
     {
+        if (ActionCallback != null) callback = ActionCallback;
         ShowActionUI();
         var ObservingTiles = _mapGen.HighlighTilesAround(Entity.transform.position, charStats.Move);
         ObservingTiles.ToList().ForEach(t => t.RaiseOnClick += TileSelected);
@@ -36,14 +35,22 @@ public class MoveAction : IAction
 
     }
 
-    public void ShowConfirmation(Action onConfirm, Action onCancel)
+    public ActionResult ShowConfirmation(Action onConfirm = null, Action onCancel = null)
     {
         throw new NotImplementedException();
     }
 
-    public void TileSelected(object sender,OnClickEventArgs eventArgs)
+    public void TileSelected(object sender, OnClickEventArgs eventArgs)
     {
         subscriptions.ForEach(t => t.RaiseOnClick -= TileSelected);
-        Debug.Log("Clicked");
+        subscriptions = new List<MapTerrain>();
+        var startTile = _mapGen.GetTileOf(Entity.gameObject);
+        var endTile = eventArgs.SenderGameObject.GetComponent<MapTerrain>();
+        var path = _mapGen.FindPath(startTile, endTile);
+        Entity.Move(path, callback);
+        startTile.ClearObject();
+        endTile.SetObject(Entity.gameObject);
+        _mapGen.DeHighlight();\
+        base.ActionCompleted()
     }
 }

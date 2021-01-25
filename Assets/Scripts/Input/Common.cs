@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class OnClickEventArgs : EventArgs
 {
-    public MonoBehaviour SenderGameObject { get; set; }
+    public GameObject SenderGameObject { get; set; }
 }
 
 public interface IInteractible
@@ -21,7 +21,7 @@ public class InteractibleGameObject : MonoBehaviour, IInteractible
     {
         RaiseOnClick?.Invoke(this, new OnClickEventArgs()
         {
-            SenderGameObject = this
+            SenderGameObject = this.gameObject
         });
     }
 }

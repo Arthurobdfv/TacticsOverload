@@ -50,7 +50,7 @@ public class Player : Unit
     {
         Stats = new CharacterStats()
         {
-            Move = 2,
+            Move = 4,
             MaxHealth = 10,
             Attack = 3
         };
@@ -61,7 +61,10 @@ public class Player : Unit
         m_actions.Add(new AttackAction());
     }
 
-
+    void OnActionComplete(IAction action)
+    {
+        m_actions.Remove(action);
+    }
 
     private string m_name;
     bool m_allowMove;

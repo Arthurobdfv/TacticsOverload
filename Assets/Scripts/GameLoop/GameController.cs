@@ -46,12 +46,18 @@ public class GameController : MonoBehaviour
 
     public void EventSubscription()
     {
-        InteractibleGameObject.RaiseOnClick += EntityClicked;
+        foreach(var p in PlayerInstances)
+        {
+            p.RaiseOnClick += EntityClicked;
+        }
     }
 
     public void EventUnsubscription()
     {
-        InteractibleGameObject.RaiseOnClick -= EntityClicked;
+        foreach (var p in PlayerInstances)
+        {
+            p.RaiseOnClick -= EntityClicked;
+        }
     }
 
     private void Update()

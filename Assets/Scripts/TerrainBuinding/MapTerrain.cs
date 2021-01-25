@@ -34,6 +34,11 @@ public class MapTerrain : InteractibleGameObject
         objectToSet.transform.position = SetPoint;
     }
 
+    public void ClearObject()
+    {
+        if (IsOccupied) Object = null;
+    }
+
     public void Highlight()
     {
         m_renderer.material = m_highlightedMaterial;

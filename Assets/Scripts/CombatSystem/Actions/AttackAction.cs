@@ -11,6 +11,8 @@ public class AttackAction : IAction
 
     public Unit Entity => throw new NotImplementedException();
 
+    public event EventHandler<ActionEventArgs> ActionCompleted;
+
     public void Action(CharacterStats stats, Action ActionCallback = null)
     {
         throw new NotImplementedException();
